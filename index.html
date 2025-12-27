@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>MapleMono 字体分发</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+            line-height: 1.6;
+            color: #0f172a;
+            margin: 0;
+            padding: 32px;
+            background: #f8fafc
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(2, 6, 23, 0.08)
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 24px
+        }
+
+        p.lead {
+            margin: 0 0 18px;
+            color: #475569
+        }
+
+        ul {
+            padding-left: 18px
+        }
+
+        a.card {
+            display: block;
+            padding: 12px 14px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #e6eef7;
+            text-decoration: none;
+            color: inherit;
+            background: linear-gradient(180deg, rgba(247, 250, 252, 1), #ffffff)
+        }
+
+        a.card:hover {
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+            transform: translateY(-2px)
+        }
+
+        footer {
+            margin-top: 20px;
+            color: #94a3b8;
+            font-size: 13px
+        }
+
+        .meta {
+            color: #64748b;
+            font-size: 13px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>字体分发</h1>
+        <p class="lead">页面列出当前包含的字体包，点击可以查看对应字体的生成结果和使用说明。</p>
+
+        <h2>字体列表</h2>
+        <div id="font-list">正在加载字体列表…</div>
+
+        <script>
+            async function loadFonts() {
+                const container = document.getElementById('font-list');
+                try {
+                    const resp = await fetch('/api/fonts');
+                    if (!resp.ok) throw new Error('请求失败: ' + resp.status);
+                    const list = await resp.json();
+                    if (!Array.isArray(list) || list.length === 0) {
+                        container.innerText = '未找到任何字体包（请确保每个字体文件夹包含 index.html）。';
+                        return;
+                    }
+                    const ul = document.createElement('ul');
+                    ul.style.paddingLeft = '18px';
+                    for (const f of list) {
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.className = 'card';
+                        a.href = f.href;
+                        a.innerText = f.name;
+                        const meta = document.createElement('div');
+                        meta.className = 'meta';
+                        meta.innerText = f.description || '';
+                        a.appendChild(meta);
+                        li.appendChild(a);
+                        ul.appendChild(li);
+                    }
+                    container.innerHTML = '';
+                    container.appendChild(ul);
+                } catch (e) {
+                    container.innerText = '加载字体列表时出错：' + e.message;
+                }
+            }
+            loadFonts();
+        </script>
+
+
+    </div>
+</body>
+
+</html>
